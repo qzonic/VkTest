@@ -1,0 +1,423 @@
+openapi: 3.0.2
+info:
+  title: 'VK Test API'
+  version: 'v1'
+  description: |
+    Запросы к API начинаются с `/api/v1/`
+    # Описание
+    Проект **VkTest** позволяет пользователям добавлять друг друга в друзья.
+    # Алгоритм регистрации пользователей
+    1. Пользователь отправляет POST-запрос на добавление нового пользователя с параметрами `username` и `password` на эндпоинт `auth/users/`.
+    2. **VkTest** возвращает данные зарегистрированного пользователя
+    3. Пользователь отправляет POST-запрос с параметрами `username` и `password` на эндпоинт `auth/create/`, в ответе на запрос ему приходят `refresh` и `access` токены.
+tags:
+  - name: AUTH
+    description: Регистрация пользователей и выдача токенов
+  - name: USER
+    description: |
+      Просмотреть статус дружбы, список пользователей и список друзей.
+      Удалить пользователя из друзей.
+  - name: INVITATION
+    description: |
+      Отправить, подтвердить, отклонить заявку.
+      Просмотреть входящие и исходящие заявки.
+paths:
+  /api/v1/invitation/:
+    get:
+      operationId: Входящие заявки
+      description: "Просмотр входящих заявок"
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Invitation'
+          description: Есть входящие заявки
+        '204':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: Входящих заявок нет
+        '401':
+          description: Отсутствует токен
+      tags:
+      - INVITATION
+    post:
+      operationId: Отправить заявку
+      description: |
+        Отправить заявку переданному пользователю `to_user`
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Invitation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Invitation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Invitation'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invitation'
+          description: 'Заявка создана'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: 'Отсутствует обязательное поле или оно некорректно'
+        '401':
+          description: Отсутствует токен
+      tags:
+      - INVITATION
+  /api/v1/invitation/my/:
+    get:
+      operationId: Исходящие заявки
+      description: Просмотреть исходящие заявки
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invitation'
+          description: Исходящие заявки есть
+        '204':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: Исходящих заявок нет
+        '401':
+          description: Отсутствует токен
+      tags:
+      - INVITATION
+  /api/v1/users/:
+    get:
+      operationId: Список пользователей
+      description: Просмотреть список пользователей
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    username:
+                      type: string
+          description: 'Отображение списка пользователй'
+        '401':
+          description: 'Отсутствует токен'
+      tags:
+        - USER
+  /api/v1/users/<str:username>:
+    get:
+      operationId: Друзья пользователя
+      description: Просмотреть друзей пользователя по `username`
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    username:
+                      type: string
+          description: 'Отображается список друзей'
+
+        '401':
+          description: 'Отсутствует токен'
+      tags:
+        - USER
+  /api/v1/delete-friend/<str:username>/:
+    delete:
+      operationId: Удалить друга
+      description: Удалить пользователя из друзей по `username`
+      parameters: [ ]
+      responses:
+        '204':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: 'Друг удален'
+        '401':
+          description: 'Отсутствует токен'
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: 'Пользователь `username` не найден'
+      tags:
+        - USER
+  /api/v1/users-info/my-friends/:
+    get:
+      operationId: Список друзей
+      description: Просмотреть список своих друзей
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  username:
+                    type: string
+                  friends:
+                    type: array
+                    items:
+                      type: string
+          description: 'Отображение списка друзей'
+        '401':
+          description: 'Отсутствует токен'
+      tags:
+      - USER
+  /api/v1/check-status/{username}/:
+    get:
+      operationId: Статус дружбы
+      description: Получить статус дружбы с пользователем `username`
+      parameters:
+      - name: username
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: 'Статус есть'
+        '204':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: 'Статуса нет'
+        '401':
+          description: 'Отсутствует токен'
+      tags:
+      - USER
+  /api/v1/confirm-invitation/{username}:
+    patch:
+      operationId: Принять заявку
+      description: Принять заявку от пользователя `username`
+      parameters:
+      - name: username
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: 'Заявка принята'
+        '401':
+          description: 'Отсутствует токен'
+        '404':
+          description: 'Пользователь `username` не найден'
+      tags:
+      - INVITATION
+  /api/v1/deny-invitation/{username}/:
+    patch:
+      operationId: Отклонить заявку
+      description: Отклонить заявку от пользователя `username`
+      parameters:
+      - name: username
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+          description: 'Заявка отклонена'
+        '401':
+          description: 'Отсутствует токен'
+        '404':
+          description: 'Пользователь `username` не найден'
+      tags:
+      - INVITATION
+
+  /auth/users/:
+    post:
+      operationId: Регистрация
+      description: Регистрирует пользователя с переданными `username` и `password`
+      parameters: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCreate'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: 'Отсутствует обязательное поле или оно некорректно'
+      tags:
+        - AUTH
+
+  /auth/jwt/create/:
+    post:
+      operationId: Получение токена
+      description: Возвращает access и refresh токен, если переданные данные корректные
+      parameters: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenCreate'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+          description: 'Переданы некорректные данные'
+      tags:
+        - AUTH
+  /auth/jwt/refresh/:
+    post:
+      operationId: Обновить access токен
+      description: Обновляет access токен, если переданный refresh токен корректный
+      parameters: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                  code:
+                    type: string
+          description: 'Некорректный refresh токен'
+      tags:
+        - AUTH
+components:
+  schemas:
+    ValidationError:
+      title: Ошибка валидации
+      type: object
+      properties:
+        field_name:
+          type: array
+          items:
+            type: string
+    Message:
+      type: object
+      properties:
+        message:
+          type: string
+    Invitation:
+      type: object
+      properties:
+        from_user:
+          type: string
+          readOnly: true
+        to_user:
+          type: string
+      required:
+      - to_user
+    UserCreate:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+\z
+          maxLength: 150
+        id:
+          type: integer
+          readOnly: true
+        password:
+          type: string
+          writeOnly: true
+      required:
+        - username
+        - password
+    TokenObtainPair:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+      required:
+        - username
+        - password
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+      required:
+        - refresh
+    TokenCreate:
+      type: object
+      properties:
+        refresh:
+          type: string
+        access:
+          type: string
+
