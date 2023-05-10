@@ -47,7 +47,7 @@ docker-compose exec web python manage.py collectstatic --no-input
 http://localhost/
 ```
 
-*Эндпоинты для взаимодействия с API можно посмотетреть по адресу:*
+*Эндпоинты для взаимодействия с API можно посмотетреть в документации по адресу:*
 ```
 http://localhost/redoc/
 ```
