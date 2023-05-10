@@ -43,7 +43,14 @@ paths:
                 $ref: '#/components/schemas/Message'
           description: Входящих заявок нет
         '401':
-          description: Отсутствует токен
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    detail:
+                      type: string
+            description: 'Отсутствует токен'
       tags:
       - INVITATION
     post:
@@ -76,7 +83,14 @@ paths:
                 $ref: '#/components/schemas/ValidationError'
           description: 'Отсутствует обязательное поле или оно некорректно'
         '401':
-          description: Отсутствует токен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+          description: 'Отсутствует токен'
       tags:
       - INVITATION
   /api/v1/invitation/my/:
@@ -98,7 +112,14 @@ paths:
                 $ref: '#/components/schemas/Message'
           description: Исходящих заявок нет
         '401':
-          description: Отсутствует токен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+          description: 'Отсутствует токен'
       tags:
       - INVITATION
   /api/v1/users/:
@@ -118,6 +139,13 @@ paths:
                       type: string
           description: 'Отображение списка пользователй'
         '401':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
           description: 'Отсутствует токен'
       tags:
         - USER
@@ -137,9 +165,24 @@ paths:
                     username:
                       type: string
           description: 'Отображается список друзей'
-
         '401':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
           description: 'Отсутствует токен'
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+          description: 'Пользователь с `username` не найден'
       tags:
         - USER
   /api/v1/delete-friend/<str:username>/:
@@ -155,6 +198,13 @@ paths:
                 $ref: '#/components/schemas/Message'
           description: 'Друг удален'
         '401':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
           description: 'Отсутствует токен'
         '404':
           content:
@@ -164,28 +214,6 @@ paths:
           description: 'Пользователь `username` не найден'
       tags:
         - USER
-  /api/v1/users-info/my-friends/:
-    get:
-      operationId: Список друзей
-      description: Просмотреть список своих друзей
-      parameters: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                properties:
-                  username:
-                    type: string
-                  friends:
-                    type: array
-                    items:
-                      type: string
-          description: 'Отображение списка друзей'
-        '401':
-          description: 'Отсутствует токен'
-      tags:
-      - USER
   /api/v1/check-status/{username}/:
     get:
       operationId: Статус дружбы
@@ -211,7 +239,23 @@ paths:
                 $ref: '#/components/schemas/Message'
           description: 'Статуса нет'
         '401':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
           description: 'Отсутствует токен'
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+          description: 'Пользователь с `username` не найден'
       tags:
       - USER
   /api/v1/confirm-invitation/{username}:
@@ -233,9 +277,23 @@ paths:
                 $ref: '#/components/schemas/Message'
           description: 'Заявка принята'
         '401':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
           description: 'Отсутствует токен'
         '404':
-          description: 'Пользователь `username` не найден'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+          description: 'Пользователь с `username` не найден'
       tags:
       - INVITATION
   /api/v1/deny-invitation/{username}/:
@@ -257,9 +315,23 @@ paths:
                 $ref: '#/components/schemas/Message'
           description: 'Заявка отклонена'
         '401':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
           description: 'Отсутствует токен'
         '404':
-          description: 'Пользователь `username` не найден'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+          description: 'Пользователь с `username` не найден'
       tags:
       - INVITATION
 
@@ -300,12 +372,18 @@ paths:
             schema:
               $ref: '#/components/schemas/TokenObtainPair'
       responses:
-        '201':
+        '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenCreate'
-          description: ''
+          description: 'Токен создан'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: 'Отсутствует обязательное поле или оно некорректно'
         '401':
           content:
             application/json:

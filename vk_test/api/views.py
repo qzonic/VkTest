@@ -144,11 +144,14 @@ class DeleteFriendAPIView(views.APIView):
     Вьюха для удаления пользователя из друзей
     """
 
+    serializer_class = UsernameSerializer
+
     def delete(self, request, username):
         data = {
             'message': f'Пользователь `{username}` не ваш друг!'
         }
         stat = status.HTTP_404_NOT_FOUND
+
         if request.user.friends.filter(username=username).exists():
             to_user = get_object_or_404(
                 CustomUser,
