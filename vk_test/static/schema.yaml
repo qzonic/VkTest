@@ -37,10 +37,6 @@ paths:
                   $ref: '#/components/schemas/Invitation'
           description: Есть входящие заявки
         '204':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
           description: Входящих заявок нет
         '401':
             content:
@@ -106,10 +102,6 @@ paths:
                 $ref: '#/components/schemas/Invitation'
           description: Исходящие заявки есть
         '204':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
           description: Исходящих заявок нет
         '401':
           content:
@@ -159,10 +151,13 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  properties:
-                    username:
+                type: object
+                properties:
+                  username:
+                    type: string
+                  friends:
+                    type: array
+                    items:
                       type: string
           description: 'Отображается список друзей'
         '401':
@@ -189,13 +184,9 @@ paths:
     delete:
       operationId: Удалить друга
       description: Удалить пользователя из друзей по `username`
-      parameters: [ ]
+      parameters: []
       responses:
         '204':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
           description: 'Друг удален'
         '401':
           content:
@@ -231,13 +222,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Message'
-          description: 'Статус есть'
-        '204':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
-          description: 'Статуса нет'
+          description: 'Отображение статуса'
         '401':
           content:
             application/json:
@@ -351,7 +336,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserCreate'
-          description: ''
+          description: 'Пользователь создан'
         '400':
           content:
             application/json:
@@ -404,14 +389,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TokenRefresh'
+              type: object
+              properties:
+                refresh:
+                  type: string
+              required:
+                - refresh
       responses:
         '201':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenRefresh'
-          description: ''
+          description: 'Токен обновлен'
         '401':
           content:
             application/json:

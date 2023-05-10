@@ -59,9 +59,7 @@ class InvitationViewSet(ListCreateModelViewSet):
         if invitation.exists():
             serializer = self.serializer_class(invitation, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(
-            data={'message': 'Вы еще не отправляли заявки!'},
-            status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class BaseAPIViewForInvitation(views.APIView):
@@ -124,19 +122,19 @@ class CheckStatusAPIView(views.APIView):
             username=username
         )
         if request.user.friends.filter(username=username).exists():
-            return Response(messages['friends'], status.HTTP_200_OK)
+            return Response(messages['friends'])
         elif Invitation.objects.filter(
                 from_user=request.user,
                 to_user=to_user
         ).exists():
-            return Response(messages['outcoming'], status.HTTP_200_OK)
+            return Response(messages['outcoming'])
         elif Invitation.objects.filter(
                 from_user=to_user,
                 to_user=request.user
         ).exists():
-            return Response(messages['incoming'], status.HTTP_200_OK)
+            return Response(messages['incoming'])
         else:
-            return Response(messages['nothing'], status.HTTP_204_NO_CONTENT)
+            return Response(messages['nothing'])
 
 
 class DeleteFriendAPIView(views.APIView):
@@ -150,14 +148,11 @@ class DeleteFriendAPIView(views.APIView):
         data = {
             'message': f'Пользователь `{username}` не ваш друг!'
         }
-        stat = status.HTTP_404_NOT_FOUND
-
         if request.user.friends.filter(username=username).exists():
             to_user = get_object_or_404(
                 CustomUser,
                 username=username
             )
-            data['message'] = f'Пользователь `{username}` удален из друзей!'
             request.user.friends.remove(to_user)
-            stat = status.HTTP_204_NO_CONTENT
-        return Response(data, stat)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(data, status.HTTP_404_NOT_FOUND)

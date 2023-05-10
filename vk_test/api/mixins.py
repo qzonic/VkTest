@@ -37,7 +37,5 @@ class ListMixin(mixins.ListModelMixin):
     def list(self, request, *args, **kwargs):
         invitation = self.get_queryset()
         if not invitation.exists():
-            return Response(
-                data={'message': 'У вас нет входящих заявок'},
-                status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_204_NO_CONTENT)
         return super().list(request, *args, **kwargs)

@@ -176,9 +176,9 @@ class TestUser(APITestCase):
         response = self.authorized_client.get(url_check_status)
         self.assertEqual(
             response.status_code,
-            status.HTTP_204_NO_CONTENT,
+            status.HTTP_200_OK,
             f'Проверьте, что GET-запрос на эндпоинт `{url_check_status}`, '
-            'возвращает ответ со статусом 204.'
+            'возвращает ответ со статусом 200.'
         )
         self.assertEqual(
             response.data['message'],
@@ -222,13 +222,6 @@ class TestUser(APITestCase):
             status.HTTP_204_NO_CONTENT,
             f'Проверьте, что DELETE-запрос на эндпоинт `{url_delete}`, '
             'возвращает ответ со статусом 204, если пользователь был в друзьях.'
-        )
-
-        self.assertEqual(
-            response.data['message'],
-            f'Пользователь `{self.second_user.username}` удален из друзей!',
-            f'Проверьте, что DELETE-запрос на эндпоинт `{url_delete}`, '
-            f'возвращает ответ `Пользователь `{self.second_user.username}` удален из друзей!`.'
         )
 
 
