@@ -27,7 +27,7 @@ docker-compose up -d
 
 *После сборки контейнеров, нужно прописать следующие команды по очереди:*
 ```
-docker-compose exec web python manage.py makemigrations
+docker-compose exec web python manage.py makemigrations main
 ```
 
 ```
