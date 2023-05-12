@@ -313,3 +313,6 @@ response = requests.post(url, headers=headers, data=data)
   "message": "Вы стали друзьями по обоюдным заявкам!"
 }
 ```
+
+### Автор
+[![telegram](https://img.shields.io/badge/Telegram-Join-blue)](https://t.me/qzonic)
